@@ -1,33 +1,10 @@
 import { ArrowCircleDown, ArrowCircleUp, CurrencyDollar } from "phosphor-react";
 import { SummaryCard, SummaryContainer } from "./styles";
-import { useContext } from "react";
-import { TransactionsContext } from "../../contexts/TransactionContext";
+import { priceFormatter } from "../../utils/formatter";
+import { useSummary } from "../../hooks/useSummary";
 
 export function Summary() {
-    const { transactions } = useContext(TransactionsContext);
-
-    // {income: 0 , outecome:, total:0} => Vou precisar colocar esse valores no reduce.
-    // Por causa disso iremos utilizar o reduce.
-
-    const summary = transactions.reduce(
-        (acc, transaction ) => {
-            if (transaction.type == 'income'){
-                acc.income += transaction.price;
-                acc.total += transaction.price;
-            } else {
-                acc.outecome += transaction.price;
-                acc.total -= transaction.price
-            }
-            return acc;
-        },
-         {
-            income: 0 , 
-            outecome: 0,
-            total:0
-        }
-    )
-
-    console.log(transactions)
+    const summary = useSummary();
     
     return (
         <SummaryContainer>
@@ -38,7 +15,7 @@ export function Summary() {
 
                 </header>
                 <strong>
-                    {summary.income}
+                    {priceFormatter.format(summary.income)}
                 </strong>
             </SummaryCard>
             <SummaryCard>
@@ -48,7 +25,7 @@ export function Summary() {
 
                 </header>
                 <strong>
-                    {summary.outecome}
+                    {priceFormatter.format(summary.outecome)}
                 </strong>
             </SummaryCard>
             <SummaryCard variant={'green'}>
@@ -57,7 +34,7 @@ export function Summary() {
                     <CurrencyDollar size={32} color="#ffffff" />
                 </header>
                 <strong>
-                    {summary.total}
+                    {priceFormatter.format(summary.total)}
                 </strong>
             </SummaryCard >
 
