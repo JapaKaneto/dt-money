@@ -1,9 +1,42 @@
+import { useEffect, useState } from "react";
 import { Header } from "../../components/Header";
 import { Summary } from "../../components/Summary";
 import { SearchForm } from "./components/SearchForm";
-import { TransacitonsTable, TransactionsContainer } from "./styles";
+import { PriceHighlight, TransacitonsTable, TransactionsContainer } from "./styles";
 
+interface Transaction {
+    id: number;
+    description: string;
+    type: 'income' | 'outcome';
+    price: number;
+    category: string;
+    createdAt: string;
+}
+    
 export function Transactions() {
+    const [transaction, setTransaction] = useState<Transaction[]>([]);
+    async function loadTransactions() {
+        const response = await fetch('http://localhost:3000/transactions')
+        const data = await response.json();
+
+        setTransaction(data)
+    }
+
+    useEffect(() => {
+        loadTransactions()
+    }, [])
+
+
+    // useEffect(()=> {
+    //     fetch('http://localhost:3000/transactions')
+    //         .then(response => {response.text()
+    //         .then(data => {
+    //             console.log(data)
+    //         })
+    //     })
+    
+    // }, [])
+
     return (
         <div>
             <Header />
@@ -14,18 +47,22 @@ export function Transactions() {
 
                 <TransacitonsTable>
                     <tbody>
-                        <tr>
-                            <td width="50%">Desenvolvimento de site</td>
-                            <td>R$ 12.000,00</td>
-                            <td>Venda</td>
-                            <td>13/04/2022</td>
-                        </tr>
-                        <tr>
-                            <td width="50%">Hamburguer</td>
-                            <td>-R$ 59,00</td>
-                            <td>Alimentação</td>
-                            <td>13/04/2022</td>
-                        </tr>
+                        {transaction.map(transaction => {
+                            return (
+                                    <tr key={transaction.id}>
+                                        <td width="50%">{transaction.description}</td>
+                                        <td>
+                                            <PriceHighlight variant={transaction.type}>
+                                                {transaction.price}
+                                            </PriceHighlight>
+                                        </td>
+                                        <td>{transaction.category}</td>
+                                        <td>
+                                            {transaction.createdAt}
+                                        </td>
+                                    </tr>
+                            )
+                        })}
                     </tbody>
                 </TransacitonsTable>
             </TransactionsContainer>
